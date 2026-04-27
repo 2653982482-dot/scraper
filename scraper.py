@@ -14,16 +14,12 @@ import time
 from datetime import datetime, timezone, timedelta
 
 # ============ COOKIES ============
-# NOTE: For safety, real cookie values are NOT written by the assistant.
-# Replace the placeholders with your own cookie values before running.
 COOKIES = {
-    "auth_token": "REPLACE_ME",
-    "ct0": "REPLACE_ME",
-    # Optional:
-    # "twid": "u%3D123...",
+    "auth_token": "c2b1335bed5aea8c71856782b64d82a8916422a3",
+    "ct0": "91423ba97fa4c7bbf471b7017188f797a7a3f71e0b5214f299008aae4e9bdedc4400908e827fb6cb9a05bbb2b27c1a634210863e3b86d7fd96d86de40784582612242aaa9d17648a758df2c485e3a6fb",
+    "twid": "u%3D1238075200832405504"
 }
 CT0 = COOKIES["ct0"]
-
 BEARER = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
 HEADERS = {

@@ -40,31 +40,7 @@ Important: do NOT commit any credentials to git.
 
 `scraper.py` requires authenticated cookies for X GraphQL endpoints.
 
-Provide cookies via either:
-
-1) Environment variables:
-
-```bash
-export X_AUTH_TOKEN="..."
-export X_CT0="..."
-export X_TWID="u%3D..."   # optional
-```
-
-2) A local JSON file (recommended): `x_cookies.json` in the same directory (already gitignored),
-
-```json
-{
-  "auth_token": "YOUR_AUTH_TOKEN",
-  "ct0": "YOUR_CT0",
-  "twid": "u%3D123..."
-}
-```
-
-You can also set a custom path:
-
-```bash
-export X_COOKIES_FILE="/abs/path/to/x_cookies.json"
-```
+By default, cookies are configured in `scraper.py` under `COOKIES` (you need to fill in your own values locally).
 
 How to obtain cookies (manual):
 
@@ -72,8 +48,7 @@ How to obtain cookies (manual):
 2. Open DevTools -> Application/Storage -> Cookies -> `https://x.com`.
 3. Copy values for `auth_token`, `ct0`, and (optional) `twid`.
 
-If cookies are missing, `scraper.py` will error with:
-`Missing X/Twitter cookies ...`
+If cookies are invalid/expired, X endpoints typically return 401/403.
 
 ## Quick Start
 
@@ -132,4 +107,3 @@ This repository is intended to include only:
 - `.gitignore`
 
 All produced data files (`*_raw.json`) and local credential files are intentionally excluded.
-

@@ -13,76 +13,30 @@ import os
 import time
 from datetime import datetime, timezone, timedelta
 
-# ============ COOKIES (DO NOT COMMIT SECRETS) ============
-# This module is imported by other scrapers for RELEVANT_KEYWORDS. To avoid breaking them,
-# we lazily load X/Twitter cookies only when X scraping actually runs.
-#
-# Supported ways to provide cookies:
-# 1) Env vars: X_AUTH_TOKEN, X_CT0, optional X_TWID
-# 2) JSON file (recommended): set X_COOKIES_FILE or create ./x_cookies.json
-#
-# File format:
-#   {"auth_token":"...", "ct0":"...", "twid":"u%3D..."}
-DEFAULT_COOKIES_FILE = "x_cookies.json"
-
-def _load_x_cookies_from_env():
-    auth_token = os.getenv("X_AUTH_TOKEN")
-    ct0 = os.getenv("X_CT0")
-    twid = os.getenv("X_TWID")
-    if not auth_token or not ct0:
-        return None
-    cookies = {"auth_token": auth_token, "ct0": ct0}
-    if twid:
-        cookies["twid"] = twid
-    return cookies
-
-def _load_x_cookies_from_file(path):
-    if not path or not os.path.exists(path):
-        return None
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        if not isinstance(data, dict):
-            return None
-        auth_token = data.get("auth_token")
-        ct0 = data.get("ct0")
-        twid = data.get("twid")
-        if not auth_token or not ct0:
-            return None
-        cookies = {"auth_token": str(auth_token), "ct0": str(ct0)}
-        if twid:
-            cookies["twid"] = str(twid)
-        return cookies
-    except Exception:
-        return None
-
-def load_x_cookies():
-    cookies = _load_x_cookies_from_env()
-    if cookies:
-        return cookies
-    path = os.getenv("X_COOKIES_FILE", DEFAULT_COOKIES_FILE)
-    cookies = _load_x_cookies_from_file(path)
-    if cookies:
-        return cookies
-    raise RuntimeError(
-        "Missing X/Twitter cookies. Provide env vars X_AUTH_TOKEN + X_CT0 "
-        "(optional X_TWID), or create x_cookies.json (or set X_COOKIES_FILE)."
-    )
+# ============ COOKIES ============
+# NOTE: For safety, real cookie values are NOT written by the assistant.
+# Replace the placeholders with your own cookie values before running.
+COOKIES = {
+    "auth_token": "REPLACE_ME",
+    "ct0": "REPLACE_ME",
+    # Optional:
+    # "twid": "u%3D123...",
+}
+CT0 = COOKIES["ct0"]
 
 BEARER = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
-def build_headers(ct0):
-    return {
-        "authorization": BEARER,
-        "x-csrf-token": ct0,
-        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "x-twitter-active-user": "yes",
-        "x-twitter-auth-type": "OAuth2Session",
-        "content-type": "application/json",
-        "accept": "*/*",
-        "accept-language": "en-US,en;q=0.9",
-        "referer": "https://x.com/",
-    }
+HEADERS = {
+    "authorization": BEARER,
+    "x-csrf-token": CT0,
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "x-twitter-active-user": "yes",
+    "x-twitter-auth-type": "OAuth2Session",
+    "content-type": "application/json",
+    "accept": "*/*",
+    "accept-language": "en-US,en;q=0.9",
+    "referer": "https://x.com/",
+}
 
 # ============ OPT 1: ACCOUNT TIERING ============
 # must_read: every tweet is processed regardless of engagement
@@ -287,19 +241,9 @@ USER_TWEETS_FEATURES = {
     "responsive_web_enhance_cards_enabled": False
 }
 
-_session = None
-
-def get_session():
-    global _session
-    if _session is not None:
-        return _session
-    cookies = load_x_cookies()
-    ct0 = cookies.get("ct0")
-    s = requests.Session()
-    s.cookies.update(cookies)
-    s.headers.update(build_headers(ct0))
-    _session = s
-    return _session
+session = requests.Session()
+session.cookies.update(COOKIES)
+session.headers.update(HEADERS)
 
 def get_user_id(username):
     # Updated Query ID (2026-03)
@@ -310,7 +254,6 @@ def get_user_id(username):
         "fieldToggles": json.dumps({"withAuxiliaryUserLabels": False})
     }
     try:
-        session = get_session()
         r = session.get(url, params=params, timeout=15)
         if r.status_code == 200:
             user_result = r.json().get("data", {}).get("user", {}).get("result", {})
@@ -341,7 +284,6 @@ def get_user_tweets(user_id, count=20):
             "features": json.dumps(USER_TWEETS_FEATURES)
         }
         try:
-            session = get_session()
             r = session.get(url, params=params, timeout=15)
             if r.status_code == 200:
                 return parse_timeline(r.json())

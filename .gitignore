@@ -1,0 +1,28 @@
+## Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+## macOS
+.DS_Store
+
+## Env / secrets (DO NOT COMMIT)
+.env
+.env.*
+x_cookies.json
+*cookies*.json
+
+## Scraper outputs
+*_raw.json
+*_state.json
+scraper_state.json
+reddit_state.json
+warnings.log
+test_output.txt
+
+## Playwright
+playwright/.cache/

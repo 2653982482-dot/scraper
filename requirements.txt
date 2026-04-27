@@ -1,0 +1,14 @@
+# 核心抓取
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# Playwright 抓取（TechCrunch / SocialMediaToday 等）
+playwright>=1.42.0
+playwright-stealth>=1.0.6
+
+# AIME / 飞书相关（在 AIME 环境中通常已内置，如本地 pip 不到可忽略）
+byted-aime-sdk
+
+# 辅助
+python-dateutil>=2.9.0
